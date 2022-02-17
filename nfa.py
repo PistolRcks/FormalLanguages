@@ -2,32 +2,6 @@ from dataclasses import dataclass, field
 from typing import Dict
 
 @dataclass
-class NFARunner:
-    """Class defining a "runner" which "runs" throughout an NFA."""
-    
-    """The state the Runner is currently in."""
-    state: int
-
-    """ The history of all states the Runner has visited. 
-        Should be instantiated with the stateHistory of the Runner
-        which created it.
-    """
-    stateHistory: str
-
-    def transitionIfPossible(
-            self, char: str, transitions: Dict[str, list[int]]
-            ) -> bool:
-        """ Attempt a transition. If successful, return true. 
-            Otherwise, return false.
-        """
-        if char in transitions.keys():
-            
-            return True
-        
-        return False
-
-
-@dataclass
 class NFA:
     """Class defining a nondeterministic finite automaton (NFA)."""
     
@@ -37,19 +11,23 @@ class NFA:
         and the values in each dict define to which nodes it will transition
         (each position in the binary string defines a state).
     """
-    states: list[Dict[str, bytes]
+    states: list[Dict[str, bytes]]
 
     """The states we start at, as bytes defined earlier."""
     startingStates: bytes
 
     """The current states we are on, as bytes defined earlier."""
-    _currentStates: bytes = field(default=startingStates, init=False)
+    _currentStates: bytes = field(init=False)
 
-    """The alphabet of all allowed characters within the DFA."""
+    """The alphabet of all allowed characters within the NFA."""
     alphabet: list[str]
 
     """All accepting states, as bytes defined earlier."""
     acceptingStates: bytes 
+
+    def __post_init__(self):
+        print(f"Starting bytes: {bin(self.startingStates)}")
+        self._currentStates = self.startingStates
 
     def transition(self, char : str):
         """Transitions to the next state based on an inputted char."""
@@ -74,6 +52,8 @@ class NFA:
         # And we're all done
         self._currentStates = nextStates
     
+        print(f"Current bytes: {bin(self._currentStates)}")
+
     def isAccepting(self) -> bool:
         """Checks to see if the current state we are in is an accepting state."""
         # If, when we intersect (bitwise and), we get a 0, we have the empty set
