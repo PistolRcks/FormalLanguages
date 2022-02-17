@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Dict
+from typing import Dict, List # List required for versions 3.8 and below
 
 @dataclass
 class NFA:
@@ -11,7 +11,7 @@ class NFA:
         and the values in each dict define to which nodes it will transition
         (each position in the binary string defines a state).
     """
-    states: list[Dict[str, bytes]]
+    states: List[Dict[str, bytes]]
 
     """The states we start at, as bytes defined earlier."""
     startingStates: bytes
@@ -20,7 +20,7 @@ class NFA:
     _currentStates: bytes = field(init=False)
 
     """The alphabet of all allowed characters within the NFA."""
-    alphabet: list[str]
+    alphabet: List[str]
 
     """All accepting states, as bytes defined earlier."""
     acceptingStates: bytes 
@@ -42,8 +42,10 @@ class NFA:
         while self._currentStates != 0:
             # If the last bit is a one (there is a transition to this node)
             if (self._currentStates & 1) == 1:
+                trans = self.states[stateCounter][char]
+                print(f"Transition: q{stateCounter} -> {self.getStatesFromBytes(trans)}")
                 # Bitwise Or on the states to transition to
-                nextStates = nextStates | self.states[stateCounter][char]
+                nextStates = nextStates | trans
 
             # Shave off the last bit
             self._currentStates = self._currentStates >> 1
@@ -53,6 +55,20 @@ class NFA:
         self._currentStates = nextStates
     
         print(f"Current bytes: {bin(self._currentStates)}")
+
+    def getStatesFromBytes(self, seq : bytes) -> str:
+        """Gets a formatted string of all the states representing the byte sequence."""
+        stateStr = ""
+        stateCounter = 0
+        while seq != 0:
+            if (seq & 1) == 1:
+                # Don't add a comma if this is the first we're appending to the string
+                comma = ", " if stateStr != "" else ""
+                stateStr += f"{comma}q{stateCounter}"
+            seq = seq >> 1
+            stateCounter += 1
+
+        return stateStr
 
     def isAccepting(self) -> bool:
         """Checks to see if the current state we are in is an accepting state."""
