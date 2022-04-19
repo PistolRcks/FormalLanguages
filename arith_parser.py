@@ -52,10 +52,11 @@ def main():
             # ignore epsilons
             if stack_top == "e":
                 stack.pop()
+            else:
                 try:
-                    # don't push empties!!!
-                    if LOOKUP_TABLE[stack_top][char] != "":
-                        raise Exception() # Not going to the except somehow???
+                    # don't push empties!!! Immediately throw
+                    if LOOKUP_TABLE[stack_top][char] == "":
+                        raise Exception()
 
                     top_idx = len(stack) - 1
                     pushString(stack, LOOKUP_TABLE[stack_top][char])
