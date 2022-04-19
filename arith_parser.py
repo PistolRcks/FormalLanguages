@@ -1,5 +1,4 @@
 import re
-from time import sleep
 from copy import copy
 
 LOOKUP_TABLE = {
