@@ -46,8 +46,8 @@ def main():
             return
         # Continue to process the current character until we end up pushing a matching terminal
         while char != stack_top:
-            print(f"Char: {char}")
-            print(f"Pre-push Stack: {stack}")
+            #print(f"Char: {char}")
+            #print(f"Pre-push Stack: {stack}")
             # ignore epsilons
             if stack_top == "e":
                 stack.pop()
@@ -64,7 +64,7 @@ def main():
                     print(f"Expression is incorrectly formatted.\nError: {expr[:i]} ^ {expr[i:-2]}")
                     return
 
-            print(f"Post-push stack: {stack}\n")
+            #print(f"Post-push stack: {stack}\n")
             stack_top = copy(stack[-1]) # Copy instead of reference
 
         # Pop the terminal (but only get the top if the stack exists!)
