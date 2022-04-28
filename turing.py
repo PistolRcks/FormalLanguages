@@ -42,22 +42,20 @@ class Tape:
             # If we overshoot at the left, it's always at zero
             self.position = 0
 
-    def perform_action(self, read : str, write : str, move_dir : str):
+    def perform_action(self, write : str, move_dir : str):
         """ Attempts to perform the action of a Turing Machine state transition.
             
             Parameters:
-                `str` read - The required character to be read
                 `str` write - The character to write onto the tape
                 `str` move_dir` - The direction ("l", "r", "L", "R") to move the head
                     after the write operation. If not in the list, automatically choose
                     to move to the right.
         """
-        if self.read() == read:
-            self.write(write)
-            if move_dir.upper() == "L":
-                self.move_left()
-            else:
-                self.move_right()
+        self.write(write)
+        if move_dir.upper() == "L":
+            self.move_left()
+        else:
+            self.move_right()
 
 @dataclass
 class TuringMachine():
@@ -75,9 +73,45 @@ class TuringMachine():
                 "<char_direction_to_move>",   # Only "L", "R", "l", or "r"
                 <int_state_to_transition>
             )
+        State 0 is always the starting state.
     """
     states : list
-    """ Initial tape state """
+    """ The current state we are in. """
+    current_state : int = field(default=0, init=False)
+    """ Tape with which to use the Turing Machine. """
     tape : Tape
+    """ List of ints which describes which states are accepting. """
+    accepting_states : list
+    """ Whether or not the Turing Machine has halted. """
+    is_halted : bool = field(default=False, init=False)
 
+    def is_accepting(self) -> bool:
+        """ Returns whether or not the Turing Machine is in an accepting state. """
+        return current_state in accepting_states
+
+    def evaluate_step(self):
+        """ Evaluates one step of the Turing Machine. """
+        # Check if we can transition with this character
+        tape_char = self.tape.read()
+        if tape_char in self.states[self.current_state].keys() and not self.is_halted:
+            # Apply the transition
+            transition = self.states[self.current_state][tape_char]
+            self.tape.perform_action(transition[0], transition[1])
+            self.current_state = transition[2]
+        # Otherwise halt
+        else:
+            self.is_halted = True
+
+
+
+    def evaluate_until_halted(self) -> bool:
+        """ Evaluates the Turing Machine until it halts.
+            Returns whether or not the Turing Machine halted on an accepting state.
+        """
+    
+        while not self.is_halted:
+            self.evaluate_step()
+
+        return self.is_accepting()
+        
     
