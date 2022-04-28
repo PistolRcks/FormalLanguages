@@ -10,8 +10,21 @@ class Tape:
         self.data.append("B")
         self.data.insert(0, "B")
 
+    def to_string(self) -> str:
+        """ Returns the contents of the tape as a string. """
+        string : str = ""
+        for i, c in enumerate(self.data):
+            string += c
+            # Draw arrows around the head
+            if i + 1 == self.position:
+                string += ">"
+            if i == self.position:
+                string += "<"
+
+        return string
+
     def read(self) -> str:
-        """ Returns the character at the current tape position."""
+        """ Returns the character at the current tape position. """
         return self.data[self.position]
 
     def write(self, char : str):
@@ -76,33 +89,37 @@ class TuringMachine():
         State 0 is always the starting state.
     """
     states : list
-    """ The current state we are in. """
-    current_state : int = field(default=0, init=False)
     """ Tape with which to use the Turing Machine. """
     tape : Tape
     """ List of ints which describes which states are accepting. """
     accepting_states : list
+    """ The current state we are in. """
+    current_state : int = field(default=0, init=False)
     """ Whether or not the Turing Machine has halted. """
     is_halted : bool = field(default=False, init=False)
 
     def is_accepting(self) -> bool:
         """ Returns whether or not the Turing Machine is in an accepting state. """
-        return current_state in accepting_states
+        return self.current_state in self.accepting_states
 
     def evaluate_step(self):
         """ Evaluates one step of the Turing Machine. """
+        print(f"Current tape: {self.tape.to_string()}")
         # Check if we can transition with this character
         tape_char = self.tape.read()
+        print(f"\tReading {tape_char}...")
         if tape_char in self.states[self.current_state].keys() and not self.is_halted:
             # Apply the transition
             transition = self.states[self.current_state][tape_char]
             self.tape.perform_action(transition[0], transition[1])
             self.current_state = transition[2]
+            print(f"\tTransitioned to {self.current_state}.")
+            # Halt on accepting states
+            if self.is_accepting():
+                self.is_halted = True
         # Otherwise halt
         else:
             self.is_halted = True
-
-
 
     def evaluate_until_halted(self) -> bool:
         """ Evaluates the Turing Machine until it halts.
