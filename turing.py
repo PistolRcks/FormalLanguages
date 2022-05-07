@@ -104,16 +104,14 @@ class TuringMachine():
 
     def evaluate_step(self):
         """ Evaluates one step of the Turing Machine. """
-        print(f"Current tape: {self.tape.to_string()}")
+        print(f"Current tape: {self.tape.to_string()}, state {self.current_state}")
         # Check if we can transition with this character
         tape_char = self.tape.read()
-        print(f"\tReading {tape_char}...")
         if tape_char in self.states[self.current_state].keys() and not self.is_halted:
             # Apply the transition
             transition = self.states[self.current_state][tape_char]
             self.tape.perform_action(transition[0], transition[1])
             self.current_state = transition[2]
-            print(f"\tTransitioned to {self.current_state}.")
             # Halt on accepting states
             if self.is_accepting():
                 self.is_halted = True
